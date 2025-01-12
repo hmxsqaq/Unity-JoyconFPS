@@ -1,39 +1,37 @@
 ﻿using UnityEngine;
 using System.Collections;
+using Sirenix.OdinInspector;
 
-// ----- Low Poly FPS Pack Free Version -----
-public class TargetScript : MonoBehaviour {
+public class TargetScript : MonoBehaviour
+{
+	private float _randomTime;
+	private bool _routineStarted;
 
-	float randomTime;
-	bool routineStarted = false;
-
-	//Used to check if the target has been hit
-	public bool isHit = false;
+	[SerializeField, ReadOnly] public bool isHit;
 
 	[Header("Customizable Options")]
 	//Minimum time before the target goes back up
-	public float minTime;
+	[SerializeField] private float minTime;
 	//Maximum time before the target goes back up
-	public float maxTime;
+	[SerializeField] private float maxTime;
 
 	[Header("Audio")]
-	public AudioClip upSound;
-	public AudioClip downSound;
+	[SerializeField] private AudioClip upSound;
+	[SerializeField] private AudioClip downSound;
+	[SerializeField] private AudioSource audioSource;
 
-	public AudioSource audioSource;
-	
-	private void Update () {
-		
+	private void Update()
+	{
 		//Generate random time based on min and max time values
-		randomTime = Random.Range (minTime, maxTime);
+		_randomTime = Random.Range(minTime, maxTime);
 
 		//If the target is hit
-		if (isHit == true) 
+		if (isHit)
 		{
-			if (routineStarted == false) 
+			if (_routineStarted == false)
 			{
 				//Animate the target "down"
-				gameObject.GetComponent<Animation> ().Play("target_down");
+				gameObject.GetComponent<Animation>().Play("target_down");
 
 				//Set the downSound as current sound, and play it
 				audioSource.GetComponent<AudioSource>().clip = downSound;
@@ -41,17 +39,18 @@ public class TargetScript : MonoBehaviour {
 
 				//Start the timer
 				StartCoroutine(DelayTimer());
-				routineStarted = true;
-			} 
+				_routineStarted = true;
+			}
 		}
 	}
 
 	//Time before the target pops back up
-	private IEnumerator DelayTimer () {
+	private IEnumerator DelayTimer()
+	{
 		//Wait for random amount of time
-		yield return new WaitForSeconds(randomTime);
+		yield return new WaitForSeconds(_randomTime);
 		//Animate the target "up" 
-		gameObject.GetComponent<Animation> ().Play ("target_up");
+		gameObject.GetComponent<Animation>().Play("target_up");
 
 		//Set the upSound as current sound, and play it
 		audioSource.GetComponent<AudioSource>().clip = upSound;
@@ -59,7 +58,6 @@ public class TargetScript : MonoBehaviour {
 
 		//Target is no longer hit
 		isHit = false;
-		routineStarted = false;
+		_routineStarted = false;
 	}
 }
-// ----- Low Poly FPS Pack Free Version -----

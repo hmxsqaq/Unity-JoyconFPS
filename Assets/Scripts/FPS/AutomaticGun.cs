@@ -4,6 +4,7 @@ using Sirenix.OdinInspector;
 using UnityEngine;
 using UnityEngine.UI;
 using Random = UnityEngine.Random;
+using Rigidbody = UnityEngine.Rigidbody;
 
 namespace FPS
 {
@@ -82,10 +83,10 @@ namespace FPS
 		[SerializeField] private AudioSource shootAudioSource; //Audio source used for shoot sound
 
 		[Title("UI Components")]
-		[SerializeField] private Text timescaleText;
 		[SerializeField] private Text currentWeaponText;
 		[SerializeField] private Text currentAmmoText;
 		[SerializeField] private Text totalAmmoText;
+		[SerializeField] private GameObject crossHair;
 
 		[SerializeField, FoldoutGroup("Prefabs"), AssetsOnly] private Transform bulletPrefab;
 		[SerializeField, FoldoutGroup("Prefabs"), AssetsOnly] private Transform casingPrefab;
@@ -105,6 +106,7 @@ namespace FPS
 
 		[Title("Input")]
 		[SerializeField] private InputSetting inputSetting;
+		[SerializeField] private bool firstShoot = true;
 
 		private Animator _animator; //Animator component attached to weapon
 
@@ -127,12 +129,13 @@ namespace FPS
 		private void Update()
 		{
 			//Aiming: Toggle camera FOV when right click is held down
-			if (JoyconInput.instance.GetButton(inputSetting.aimButton) && !_isReloading && !_isRunning && !_isInspecting)
+			if (JoyconInput.instance.GetButton(inputSetting.aimButtonDesc) && !_isReloading && !_isRunning && !_isInspecting)
 			{	//Start aiming
 				_isAiming = true;
 				_animator.SetBool(Aim, true);
 				gunCamera.fieldOfView = Mathf.Lerp(gunCamera.fieldOfView, aimFov, fovSpeed * Time.deltaTime);
 				inputSetting.rotateType = RotateType.Gyro;
+				crossHair.SetActive(false);
 				if (!_soundHasPlayed)
 				{
 					mainAudioSource.clip = aimSound;
@@ -147,6 +150,7 @@ namespace FPS
 				_animator.SetBool(Aim, false);
 				_soundHasPlayed = false;
 				inputSetting.rotateType = RotateType.Orientation;
+				crossHair.SetActive(true);
 			}
 			//Aiming end
 
@@ -161,7 +165,7 @@ namespace FPS
 			AnimationCheck();
 
 			//Throw grenade
-			if (JoyconInput.instance.GetButtonDown(inputSetting.throwGrenadeButton) && !_isInspecting)
+			if (JoyconInput.instance.GetButtonDown(inputSetting.throwGrenadeButtonDesc) && !_isInspecting)
 			{
 				StartCoroutine(GrenadeSpawnDelay());
 				_animator.Play("GrenadeThrow", 0, 0.0f); //Play grenade throw animation
@@ -182,8 +186,10 @@ namespace FPS
 
 			//Automatic fire
 			//Left click hold
-			if (JoyconInput.instance.GetButton(inputSetting.fireButton) && !_outOfAmmo && !_isReloading && !_isInspecting && !_isRunning)
+			if (JoyconInput.instance.GetButton(inputSetting.fireButtonDesc) && !_outOfAmmo && !_isReloading && !_isInspecting && !_isRunning)
 			{
+				if (firstShoot) { firstShoot = false; return; }
+
 				//Shoot automatic
 				if (Time.time - _lastFired > 1 / fireRate)
 				{
@@ -243,7 +249,7 @@ namespace FPS
 			}
 
 			//Inspect weapon
-			if (JoyconInput.instance.GetButtonDown(inputSetting.inspectButton))
+			if (JoyconInput.instance.GetButtonDown(inputSetting.inspectButtonDesc))
 				_animator.SetTrigger(Inspect);
 
 			//Toggle weapon holster when E key is pressed
@@ -266,7 +272,7 @@ namespace FPS
 			_animator.SetBool(Holster, _holstered);
 
 			//Reload
-			if (JoyconInput.instance.GetButtonDown(inputSetting.reloadButton) && !_isReloading && !_isInspecting) Reload();
+			if (JoyconInput.instance.GetButtonDown(inputSetting.reloadButtonDesc) && !_isReloading && !_isInspecting) Reload();
 
 			var stick = JoyconInput.instance.GetStick(0);
 			//Walking
@@ -332,7 +338,7 @@ namespace FPS
 				mainAudioSource.Play();
 				//If out of ammo, hide the bullet renderer in the mag
 				//Do not show if bullet renderer is not assigned in inspector
-				if (bulletInMagRenderer != null)
+				if (bulletInMagRenderer)
 				{
 					bulletInMagRenderer.GetComponent<SkinnedMeshRenderer>().enabled = false;
 					StartCoroutine(ShowBulletInMag());

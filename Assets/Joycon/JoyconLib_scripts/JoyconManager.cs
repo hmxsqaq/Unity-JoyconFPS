@@ -2,8 +2,9 @@
 using System.Runtime.InteropServices;
 using UnityEngine;
 using System;
+using Hmxs.Scripts.Utility;
 
-public class JoyconManager : MonoBehaviour
+public class JoyconManager : SingletonMono<JoyconManager>
 {
 	// Settings accessible via Unity
 	public bool enableImu = true;
@@ -17,13 +18,8 @@ public class JoyconManager : MonoBehaviour
 
 	public List<Joycon> Joycons; // Array of all connected Joy-Cons
 
-	public static JoyconManager instance { get; private set; }
-
-	private void Awake()
+	protected override void Awake()
 	{
-		if (instance != null) Destroy(gameObject);
-		instance = this;
-
 		Joycons = new List<Joycon>();
 		bool isLeft = false;
 		HIDapi.hid_init();
@@ -92,8 +88,9 @@ public class JoyconManager : MonoBehaviour
 		foreach (var joycon in Joycons) joycon.Update();
 	}
 
-	private void OnApplicationQuit()
+	protected override void OnDestroy()
 	{
 		foreach (var joycon in Joycons) joycon.Detach();
+		base.OnDestroy();
 	}
 }

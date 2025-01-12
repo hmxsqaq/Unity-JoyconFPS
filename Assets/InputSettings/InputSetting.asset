@@ -21,18 +21,19 @@ MonoBehaviour:
   runButtonDesc:
     joyconIndex: 0
     button: 2
-  fireButton:
+  rotateType: 0
+  fireButtonDesc:
     joyconIndex: 0
     button: 12
-  reloadButton:
+  reloadButtonDesc:
     joyconIndex: 0
     button: 3
-  aimButton:
+  aimButtonDesc:
     joyconIndex: 0
     button: 11
-  throwGrenadeButton:
+  throwGrenadeButtonDesc:
     joyconIndex: 0
     button: 1
-  inspectButton:
+  inspectButtonDesc:
     joyconIndex: 0
     button: 9

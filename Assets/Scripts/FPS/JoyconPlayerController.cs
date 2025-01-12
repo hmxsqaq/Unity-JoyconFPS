@@ -21,8 +21,10 @@ namespace FPS
 
 		[Title("Look")]
 		[SerializeField] private float rotationSmoothing = 0.05f;
-		[SerializeField] private float verticalSensitivity = 1.0f;
-		[SerializeField] private float horizontalSensitivity = 1.0f;
+		[SerializeField] private float orientationVerticalSensitivity = 1.0f;
+		[SerializeField] private float orientationHorizontalSensitivity = 1.0f;
+		[SerializeField] private float gyroVerticalSensitivity = 0.5f;
+		[SerializeField] private float gyroHorizontalSensitivity = 0.5f;
 		[SerializeField] private float minVerticalAngle = -90.0f;
 		[SerializeField] private float maxVerticalAngle = 90.0f;
 
@@ -107,8 +109,12 @@ namespace FPS
 		{
 			switch (inputSetting.rotateType)
 			{
-				case RotateType.Orientation: RotateCameraAndCharacterByOrientation(); break;
-				case RotateType.Gyro: RotateCameraAndCharacterByGyro(); break;
+				case RotateType.Orientation:
+					RotateCameraAndCharacterByOrientation();
+					break;
+				case RotateType.Gyro:
+					RotateCameraAndCharacterByGyro();
+					break;
 				default:
 					throw new ArgumentOutOfRangeException();
 			}
@@ -121,8 +127,8 @@ namespace FPS
 		{
 			var orientation = JoyconInput.instance.GetOrientation(0);
 			var look = Quaternion.Euler(
-				orientation.eulerAngles.x * verticalSensitivity,
-				orientation.eulerAngles.y * horizontalSensitivity,
+				orientation.eulerAngles.x * orientationVerticalSensitivity,
+				orientation.eulerAngles.y * orientationHorizontalSensitivity,
 				0);
 			var verticalAngle = NormalizeAngle(look.eulerAngles.x);
 			verticalAngle = Mathf.Clamp(verticalAngle, minVerticalAngle, maxVerticalAngle);
@@ -134,8 +140,8 @@ namespace FPS
 		private void RotateCameraAndCharacterByGyro()
 		{
 			var gyro = JoyconInput.instance.GetGyro(0);
-			var rotationX = _rotationX.Update(gyro.z * verticalSensitivity, rotationSmoothing);
-			var rotationY = _rotationY.Update(gyro.y * horizontalSensitivity, rotationSmoothing);
+			var rotationX = _rotationX.Update(gyro.z * gyroVerticalSensitivity, rotationSmoothing);
+			var rotationY = _rotationY.Update(gyro.y * gyroHorizontalSensitivity, rotationSmoothing);
 			var clampedY = RestrictVerticalRotation(rotationY);
 			_rotationY.current = clampedY;
 			var worldUp = arms.InverseTransformDirection(Vector3.up);
