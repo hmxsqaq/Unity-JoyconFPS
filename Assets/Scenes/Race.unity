@@ -14470,7 +14470,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   timeCountText: {fileID: 995750566}
   rankingPanel: {fileID: 250229163}
-  maxRaceTimeInSeconds: 180
+  maxRaceTimeInSeconds: 90
   worldButton: {fileID: 1430282863}
 --- !u!4 &1966723100
 Transform:
