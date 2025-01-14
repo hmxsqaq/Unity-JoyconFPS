@@ -60,6 +60,8 @@ namespace FPS
 
 		[Title("Grenade Settings")]
 		[SerializeField] private float grenadeSpawnDelay = 0.35f;
+		[SerializeField] private float grenadeCooldown = 1.5f;
+		private bool _canThrowGrenade = true;
 
 		[Title("Muzzle flash Settings")]
 		[SerializeField] private bool randomMuzzleFlash;
@@ -152,7 +154,7 @@ namespace FPS
 				inputSetting.rotateType = RotateType.Orientation;
 				crossHair.SetActive(true);
 			}
-			//Aiming end
+
 
 			//If randomize muzzleFlash is true, generate random int values
 			if (randomMuzzleFlash)
@@ -165,9 +167,10 @@ namespace FPS
 			AnimationCheck();
 
 			//Throw grenade
-			if (JoyconInput.instance.GetButtonDown(inputSetting.throwGrenadeButtonDesc) && !_isInspecting)
+			var accel = JoyconInput.instance.GetAccel(0);
+			if (accel.magnitude > 2.5f && JoyconInput.instance.GetButton(inputSetting.throwGrenadeButtonDesc) && _canThrowGrenade && !_isInspecting)
 			{
-				StartCoroutine(GrenadeSpawnDelay());
+				StartCoroutine(GrenadeSpawnDelay(accel.magnitude));
 				_animator.Play("GrenadeThrow", 0, 0.0f); //Play grenade throw animation
 			}
 
@@ -252,25 +255,6 @@ namespace FPS
 			if (JoyconInput.instance.GetButtonDown(inputSetting.inspectButtonDesc))
 				_animator.SetTrigger(Inspect);
 
-			//Toggle weapon holster when E key is pressed
-			if (Input.GetKeyDown(KeyCode.E) && !_hasBeenHolstered)
-			{
-				_holstered = true;
-				mainAudioSource.clip = holsterSound;
-				mainAudioSource.Play();
-				_hasBeenHolstered = true;
-			}
-			else if (Input.GetKeyDown(KeyCode.E) && _hasBeenHolstered)
-			{
-				_holstered = false;
-				mainAudioSource.clip = takeOutSound;
-				mainAudioSource.Play();
-				_hasBeenHolstered = false;
-			}
-
-			//Holster anim toggle
-			_animator.SetBool(Holster, _holstered);
-
 			//Reload
 			if (JoyconInput.instance.GetButtonDown(inputSetting.reloadButtonDesc) && !_isReloading && !_isInspecting) Reload();
 
@@ -301,10 +285,15 @@ namespace FPS
 				Time.deltaTime * swaySmoothValue);
 		}
 
-		private IEnumerator GrenadeSpawnDelay()
+		private IEnumerator GrenadeSpawnDelay(float accel)
 		{
+			_canThrowGrenade = false;
 			yield return new WaitForSeconds(grenadeSpawnDelay);
-			Instantiate(grenadePrefab, grenadeSpawnPoint.transform.position, grenadeSpawnPoint.transform.rotation);
+			var obj = Instantiate(grenadePrefab, grenadeSpawnPoint.transform.position, grenadeSpawnPoint.transform.rotation);
+			var grenadeScript = obj.GetComponent<GrenadeScript>();
+			grenadeScript.Throw(accel);
+			yield return new WaitForSeconds(grenadeCooldown);
+			_canThrowGrenade = true;
 		}
 
 		private IEnumerator AutoReload()

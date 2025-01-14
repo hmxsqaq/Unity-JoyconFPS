@@ -44,14 +44,7 @@ namespace Hmxs.Scripts.JoyconTest
 			}
 
 			var smoothOrientation = Quaternion.Lerp(transform.rotation, orientation, rotationSensitivity);
-			smoothOrientation = RemoveRoll(smoothOrientation);
 			transform.rotation = smoothOrientation;
-		}
-
-		public static Quaternion RemoveRoll(Quaternion q)
-		{
-			Vector3 forward = q * Vector3.forward;
-			return Quaternion.LookRotation(forward, Vector3.up);
 		}
 	}
 }

@@ -57,7 +57,7 @@ namespace Hmxs.Scripts.JoyconTest
 			transform.rotation = Quaternion.Euler(
 				-_currentRotation.y,
 				_currentRotation.z,
-				0
+				-_currentRotation.x
 			);
 		}
 	}

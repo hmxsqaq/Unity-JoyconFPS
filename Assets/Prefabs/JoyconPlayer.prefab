@@ -6951,8 +6951,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 1, y: 0.5}
   m_AnchorMax: {x: 1, y: 0.5}
-  m_AnchoredPosition: {x: 87.519455, y: -88.1}
-  m_SizeDelta: {x: 53.9825, y: 20.6613}
+  m_AnchoredPosition: {x: 126.5, y: -88.1}
+  m_SizeDelta: {x: 96.4798, y: 20.6613}
   m_Pivot: {x: 1, y: 0.5}
 --- !u!222 &2134762282433824749
 CanvasRenderer:
@@ -6995,7 +6995,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: Grenade
+  m_Text: +Throw=Grenade
 --- !u!1 &3877149676566851195
 GameObject:
   m_ObjectHideFlags: 0
@@ -7803,7 +7803,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6183387118257373026}
   serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0.375, z: -3.58}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -13123,6 +13123,7 @@ MonoBehaviour:
   showBulletInMagDelay: 0.6
   bulletInMagRenderer: {fileID: 6192577313246509589}
   grenadeSpawnDelay: 0.35
+  grenadeCooldown: 1.5
   randomMuzzleFlash: 1
   maxRandomValue: 2
   enableMuzzleFlash: 1
